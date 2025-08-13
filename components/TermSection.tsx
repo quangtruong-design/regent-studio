@@ -1,0 +1,292 @@
+
+"use client";
+
+import { motion, useInView, useScroll, useTransform } from 'framer-motion';
+import { useRef, useState } from 'react';
+
+interface TeamMember {
+  name: string;
+  role: string;
+  image: string;
+  bio: string;
+}
+
+const teamMembers: TeamMember[] = [
+  {
+    name: "QUANG TRƯỜNG",
+    role: "Creative Director",
+    image: "https://api.builder.io/api/v1/image/assets/TEMP/2d2355fcfd15ca05dd14de041d6ae7ef3df01f81?placeholderIfAbsent=true&apiKey=a20fe3d689b84152a6502d95e7e72213",
+    bio: "Visionary leader with 10+ years in 3D design and creative direction."
+  },
+  {
+    name: "MINH ĐĂNG",
+    role: "3D Artist",
+    image: "https://api.builder.io/api/v1/image/assets/TEMP/7270f34ee198dd4ab656a7a419a1bb7a0a1c9c34?placeholderIfAbsent=true&apiKey=a20fe3d689b84152a6502d95e7e72213",
+    bio: "Expert in character modeling and environmental design with passion for detail."
+  },
+  {
+    name: "THU HẰNG",
+    role: "Motion Designer",
+    image: "https://api.builder.io/api/v1/image/assets/TEMP/15ef7c5ac1ff02d05b008d9615a59dfe216edf2b?placeholderIfAbsent=true&apiKey=a20fe3d689b84152a6502d95e7e72213",
+    bio: "Animation specialist creating compelling visual narratives and seamless motion."
+  },
+  {
+    name: "TUẤN ANH",
+    role: "Technical Artist",
+    image: "https://api.builder.io/api/v1/image/assets/TEMP/ce01a5477a99b9c9ba0fb16b7888d1f9d5b091bb?placeholderIfAbsent=true&apiKey=a20fe3d689b84152a6502d95e7e72213",
+    bio: "Bridge between art and technology, optimizing workflows and performance."
+  }
+];
+
+export function TeamSection() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const titleRef = useRef<HTMLDivElement>(null);
+  const [currentMember, setCurrentMember] = useState(0);
+  
+  const isInView = useInView(sectionRef, { once: true, margin: "-100px" });
+  const titleInView = useInView(titleRef, { once: true });
+  
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "end start"]
+  });
+  
+  const y = useTransform(scrollYProgress, [0, 1], [100, -100]);
+
+  return (
+    <motion.section 
+      ref={sectionRef}
+      className="relative min-h-screen bg-gradient-to-br from-gray-50 to-white overflow-hidden pattern-dots"
+      id="team"
+    >
+      {/* Background Elements */}
+      <motion.div 
+        className="absolute top-20 right-20 w-96 h-96 bg-gradient-to-br from-lime-400/20 to-blue-500/20 rounded-full blur-3xl"
+        style={{ y }}
+      />
+      <motion.div 
+        className="absolute bottom-20 left-20 w-64 h-64 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-full blur-3xl"
+        style={{ y: useTransform(scrollYProgress, [0, 1], [-50, 50]) }}
+      />
+
+      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-20 py-20">
+        {/* Section Title */}
+        <motion.div 
+          ref={titleRef}
+          className="text-center mb-20"
+          initial={{ opacity: 0, y: 50 }}
+          animate={titleInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.8 }}
+        >
+          <motion.h2 
+            className="text-5xl lg:text-7xl font-black text-slate-900 mb-6"
+            initial={{ scale: 0.8 }}
+            animate={titleInView ? { scale: 1 } : {}}
+            transition={{ duration: 0.8, delay: 0.2 }}
+          >
+            OUR <span className="gradient-text">TEAM</span>
+          </motion.h2>
+          <motion.p 
+            className="text-xl text-slate-600 max-w-3xl mx-auto"
+            initial={{ opacity: 0 }}
+            animate={titleInView ? { opacity: 1 } : {}}
+            transition={{ duration: 0.8, delay: 0.4 }}
+          >
+            Meet the creative minds behind our innovative 3D experiences
+          </motion.p>
+        </motion.div>
+
+        {/* Team Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+          {/* Team Members Cards */}
+          <motion.div 
+            className="space-y-8"
+            initial={{ opacity: 0, x: -50 }}
+            animate={isInView ? { opacity: 1, x: 0 } : {}}
+            transition={{ duration: 0.8, delay: 0.3 }}
+          >
+            {teamMembers.map((member, index) => (
+              <motion.div
+                key={member.name}
+                className={`perspective-card cursor-pointer ${
+                  currentMember === index ? 'scale-105' : ''
+                }`}
+                onClick={() => setCurrentMember(index)}
+                whileHover={{ scale: 1.02 }}
+                transition={{ duration: 0.3 }}
+              >
+                <motion.div 
+                  className={`glass-effect p-6 rounded-2xl transition-all duration-500 ${
+                    currentMember === index 
+                      ? 'bg-lime-400/10 border-lime-400/50 shadow-2xl' 
+                      : 'hover:bg-white/60'
+                  }`}
+                  whileHover={{ rotateY: 2, rotateX: 2 }}
+                >
+                  <div className="flex items-center space-x-4">
+                    <motion.div 
+                      className="w-16 h-16 rounded-2xl bg-gradient-to-br from-lime-400 to-blue-500 flex items-center justify-center"
+                      animate={currentMember === index ? { rotate: 360 } : {}}
+                      transition={{ duration: 0.8 }}
+                    >
+                      <span className="text-white font-bold text-lg">
+                        {member.name.charAt(0)}
+                      </span>
+                    </motion.div>
+                    <div>
+                      <h3 className="text-xl font-bold text-slate-900">
+                        {member.name}
+                      </h3>
+                      <p className="text-slate-600 font-medium">{member.role}</p>
+                    </div>
+                  </div>
+                  
+                  <motion.div
+                    className="mt-4 overflow-hidden"
+                    initial={false}
+                    animate={{
+                      height: currentMember === index ? "auto" : 0,
+                      opacity: currentMember === index ? 1 : 0
+                    }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <p className="text-slate-700 leading-relaxed">
+                      {member.bio}
+                    </p>
+                  </motion.div>
+                </motion.div>
+              </motion.div>
+            ))}
+          </motion.div>
+
+          {/* Featured Member Display */}
+          <motion.div 
+            className="relative"
+            initial={{ opacity: 0, x: 50 }}
+            animate={isInView ? { opacity: 1, x: 0 } : {}}
+            transition={{ duration: 0.8, delay: 0.5 }}
+          >
+            <motion.div 
+              className="relative perspective-card"
+              key={currentMember}
+              initial={{ opacity: 0, rotateY: 90 }}
+              animate={{ opacity: 1, rotateY: 0 }}
+              transition={{ duration: 0.6 }}
+            >
+              {/* Main Image */}
+              <motion.div 
+                className="relative overflow-hidden rounded-3xl shadow-2xl"
+                whileHover={{ scale: 1.05, rotateY: 5 }}
+                transition={{ duration: 0.4 }}
+              >
+                <img
+                  src={teamMembers[currentMember].image}
+                  alt={teamMembers[currentMember].name}
+                  className="w-full h-[500px] object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                
+                {/* Member Info Overlay */}
+                <motion.div 
+                  className="absolute bottom-6 left-6 right-6 text-white"
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.3 }}
+                >
+                  <h3 className="text-3xl font-black mb-2">
+                    {teamMembers[currentMember].name}
+                  </h3>
+                  <p className="text-lime-400 font-semibold text-lg">
+                    {teamMembers[currentMember].role}
+                  </p>
+                </motion.div>
+              </motion.div>
+
+              {/* Floating Elements */}
+              <motion.div
+                className="absolute -top-4 -right-4 w-8 h-8 bg-lime-400 rounded-full"
+                animate={{ 
+                  scale: [1, 1.2, 1],
+                  rotate: [0, 180, 360]
+                }}
+                transition={{ 
+                  duration: 4, 
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+              />
+              <motion.div
+                className="absolute -bottom-4 -left-4 w-6 h-6 border-2 border-blue-500 rounded-full"
+                animate={{ 
+                  scale: [1, 1.3, 1],
+                  opacity: [0.7, 1, 0.7]
+                }}
+                transition={{ 
+                  duration: 3, 
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay: 1
+                }}
+              />
+            </motion.div>
+          </motion.div>
+        </div>
+
+        {/* Team Stats */}
+        <motion.div 
+          className="mt-20 grid grid-cols-2 lg:grid-cols-4 gap-8"
+          initial={{ opacity: 0, y: 50 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.8, delay: 0.7 }}
+        >
+          {[
+            { number: "50+", label: "Projects Completed" },
+            { number: "5+", label: "Years Experience" },
+            { number: "20+", label: "Happy Clients" },
+            { number: "100%", label: "Satisfaction Rate" }
+          ].map((stat, index) => (
+            <motion.div 
+              key={stat.label}
+              className="text-center glass-effect p-6 rounded-2xl hover-lift"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={isInView ? { scale: 1, opacity: 1 } : {}}
+              transition={{ duration: 0.5, delay: 0.8 + index * 0.1 }}
+            >
+              <motion.div 
+                className="text-3xl lg:text-4xl font-black gradient-text mb-2"
+                initial={{ scale: 0 }}
+                animate={isInView ? { scale: 1 } : {}}
+                transition={{ 
+                  duration: 0.8, 
+                  delay: 1 + index * 0.1,
+                  type: "spring",
+                  bounce: 0.5
+                }}
+              >
+                {stat.number}
+              </motion.div>
+              <p className="text-slate-600 font-medium">{stat.label}</p>
+            </motion.div>
+          ))}
+        </motion.div>
+
+        {/* CTA Button */}
+        <motion.div 
+          className="text-center mt-16"
+          initial={{ opacity: 0, y: 50 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.8, delay: 1 }}
+        >
+          <motion.a
+            href="#member-profile"
+            className="btn-modern inline-block text-lg px-12 py-4"
+            whileHover={{ scale: 1.05, boxShadow: "0 20px 40px rgba(163, 230, 53, 0.4)" }}
+            whileTap={{ scale: 0.95 }}
+          >
+            Join Our Team
+          </motion.a>
+        </motion.div>
+      </div>
+    </motion.section>
+  );
+}
