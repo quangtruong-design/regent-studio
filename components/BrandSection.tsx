@@ -3,35 +3,32 @@
 
 import { motion, useInView, useScroll, useTransform } from 'framer-motion';
 import { useRef } from 'react';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const services = [
   {
     icon: "🎮",
-    title: "Game Assets",
-    description: "Character models, environments, and VFX optimized for performance"
+    key: "gameAssets"
   },
   {
     icon: "🎬",
-    title: "Cinematic Teasers",
-    description: "Powerful visual narratives that captivate audiences from first glance"
+    key: "cinematicTeasers"
   },
   {
     icon: "📱",
-    title: "Brand Identity",
-    description: "Compelling 3D graphics that establish strong market presence"
+    key: "brandIdentity"
   },
   {
     icon: "⚡",
-    title: "Motion Graphics",
-    description: "Dynamic animations and effects for engaging storytelling"
+    key: "motionGraphics"
   }
 ];
 
 export function BrandSection() {
   const sectionRef = useRef<HTMLElement>(null);
-  const titleRef = useRef<HTMLDivElement>(null);
   const brandTitleRef = useRef<HTMLDivElement>(null);
   const businessTitleRef = useRef<HTMLDivElement>(null);
+  const { t } = useLanguage();
   
   const isInView = useInView(sectionRef, { once: true, margin: "-100px" });
   const brandTitleInView = useInView(brandTitleRef, { once: true });
@@ -112,7 +109,7 @@ export function BrandSection() {
             animate={brandTitleInView ? { scale: 1 } : {}}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            Brand Name <span className="gradient-text">Decoding</span>
+            {t('brand.nameDecodingTitle').split(' ')[0]} {t('brand.nameDecodingTitle').split(' ')[1]} <span className="gradient-text">{t('brand.nameDecodingTitle').split(' ')[2]}</span>
           </motion.h2>
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
@@ -129,11 +126,7 @@ export function BrandSection() {
                 transition={{ duration: 0.3 }}
               >
                 <p className="text-xl text-gray-300 leading-relaxed">
-                  The name <span className="text-lime-400 font-bold">&ldquo;Regent&rdquo;</span> originates from the concept of a regent—a
-                  temporary ruler—symbolizing authority, stature, and leadership. It
-                  represents a powerful, creative entity that consistently pioneers in
-                  its field, while embodying a sense of elegance, sophistication, and
-                  professionalism.
+                  {t('brand.regentOrigin')}
                 </p>
               </motion.div>
               
@@ -143,11 +136,7 @@ export function BrandSection() {
                 transition={{ duration: 0.3 }}
               >
                 <p className="text-xl text-gray-300 leading-relaxed">
-                  Regent Studio is a creative studio specializing in <span className="text-lime-400 font-bold">3D graphics</span>,
-                  with a core focus on producing teasers for films, games, and
-                  advertisements. We don&apos;t just deliver high-quality visuals—we craft
-                  powerful emotions that captivate audiences from the very first
-                  second.
+                  {t('brand.studioDescription')}
                 </p>
               </motion.div>
               
@@ -157,10 +146,7 @@ export function BrandSection() {
                 transition={{ duration: 0.3 }}
               >
                 <p className="text-xl text-gray-300 leading-relaxed">
-                  We believe that a teaser is more than just a short video—it&apos;s a
-                  medium for <span className="text-lime-400 font-bold">storytelling, emotional connection, and brand expression</span>.
-                  With an unlimited creative spirit, Regent Studio strives to turn
-                  ideas into cinematic visual experiences.
+                  {t('brand.visionStatement')}
                 </p>
               </motion.div>
             </motion.div>
@@ -238,7 +224,7 @@ export function BrandSection() {
             animate={businessTitleInView ? { scale: 1 } : {}}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            Business <span className="gradient-text">Field</span>
+            {t('brand.businessFieldTitle').split(' ')[0]} <span className="gradient-text">{t('brand.businessFieldTitle').split(' ')[1]}</span>
           </motion.h3>
           
           {/* Services Grid */}
@@ -250,7 +236,7 @@ export function BrandSection() {
           >
             {services.map((service, index) => (
               <motion.div
-                key={service.title}
+                key={service.key}
                 className="glass-effect p-6 rounded-2xl text-center hover-lift"
                 initial={{ opacity: 0, y: 50 }}
                 animate={businessTitleInView ? { opacity: 1, y: 0 } : {}}
@@ -276,8 +262,8 @@ export function BrandSection() {
                 >
                   {service.icon}
                 </motion.div>
-                <h4 className="text-xl font-bold text-white mb-3">{service.title}</h4>
-                <p className="text-gray-400 text-sm leading-relaxed">{service.description}</p>
+                <h4 className="text-xl font-bold text-white mb-3">{t(`brand.services.${service.key}.title`)}</h4>
+                <p className="text-gray-400 text-sm leading-relaxed">{t(`brand.services.${service.key}.description`)}</p>
               </motion.div>
             ))}
           </motion.div>
@@ -291,12 +277,9 @@ export function BrandSection() {
               transition={{ duration: 0.8, delay: 0.8 }}
             >
               <div className="glass-effect p-8 rounded-3xl">
-                <h4 className="text-2xl font-bold text-lime-400 mb-4">Gaming Excellence</h4>
+                <h4 className="text-2xl font-bold text-lime-400 mb-4">{t('brand.gamingExcellence.title')}</h4>
                 <p className="text-lg text-gray-300 leading-relaxed">
-                  In the gaming sector, we provide character models, environments,
-                  vehicles, weapons, and visual effects (VFX)—all built to meet
-                  high-quality standards while remaining optimized for smooth
-                  performance across multiple platforms.
+                  {t('brand.gamingExcellence.description')}
                 </p>
               </div>
             </motion.div>
@@ -308,11 +291,9 @@ export function BrandSection() {
               transition={{ duration: 0.8, delay: 1 }}
             >
               <div className="glass-effect p-8 rounded-3xl">
-                <h4 className="text-2xl font-bold text-lime-400 mb-4">Creative Vision</h4>
+                <h4 className="text-2xl font-bold text-lime-400 mb-4">{t('brand.creativeVision.title')}</h4>
                 <p className="text-lg text-gray-300 leading-relaxed">
-                  For promotional teasers, we go beyond 3D modeling—blending motion
-                  graphics, cinematic effects, and storyboard-driven scene building
-                  to deliver powerful and engaging narratives that define brand identity.
+                  {t('brand.creativeVision.description')}
                 </p>
               </div>
             </motion.div>
@@ -332,7 +313,7 @@ export function BrandSection() {
             whileHover={{ scale: 1.05, boxShadow: "0 20px 40px rgba(163, 230, 53, 0.4)" }}
             whileTap={{ scale: 0.95 }}
           >
-            Start Your Project
+            {t('buttons.startYourProject')}
           </motion.a>
           
           <motion.a
@@ -341,7 +322,7 @@ export function BrandSection() {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            View Our Work
+            {t('buttons.viewOurWork')}
           </motion.a>
         </motion.div>
       </div>

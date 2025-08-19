@@ -63,7 +63,6 @@ body {
 
 /* Custom Animations */
 @keyframes float {
-
   0%,
   100% {
     transform: translateY(0px);
@@ -75,7 +74,6 @@ body {
 }
 
 @keyframes glow-pulse {
-
   0%,
   100% {
     box-shadow: 0 0 20px rgba(163, 230, 53, 0.4);
@@ -145,21 +143,28 @@ body {
 .glow-border {
   position: relative;
   border-radius: 16px;
-  background: linear-gradient(45deg, transparent, rgba(163, 230, 53, 0.1), transparent);
+  background: linear-gradient(
+    45deg,
+    transparent,
+    rgba(163, 230, 53, 0.1),
+    transparent
+  );
   padding: 2px;
 }
 
 .glow-border::before {
-  content: '';
+  content: "";
   position: absolute;
   inset: 0;
   border-radius: 16px;
-  background: linear-gradient(45deg,
-      transparent,
-      rgba(163, 230, 53, 0.5),
-      transparent,
-      rgba(59, 130, 246, 0.5),
-      transparent);
+  background: linear-gradient(
+    45deg,
+    transparent,
+    rgba(163, 230, 53, 0.5),
+    transparent,
+    rgba(59, 130, 246, 0.5),
+    transparent
+  );
   z-index: -1;
   animation: gradient-shift 3s linear infinite;
 }
@@ -192,19 +197,25 @@ body {
 
 /* Background Patterns */
 .pattern-dots {
-  background-image: radial-gradient(circle, rgba(163, 230, 53, 0.1) 1px, transparent 1px);
+  background-image: radial-gradient(
+    circle,
+    rgba(163, 230, 53, 0.1) 1px,
+    transparent 1px
+  );
   background-size: 20px 20px;
 }
 
 .pattern-grid {
-  background-image:
-    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+  background-image: linear-gradient(
+      rgba(255, 255, 255, 0.03) 1px,
+      transparent 1px
+    ),
     linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
   background-size: 50px 50px;
 }
 
 .pattern-x {
-  background-image: url('/images/element.svg');
+  background-image: url("/images/element.svg");
   background-size: 80px 80px;
   background-repeat: repeat;
   opacity: 0.03;
@@ -233,13 +244,18 @@ body {
 }
 
 .btn-modern::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
   transition: left 0.5s;
 }
 
@@ -258,25 +274,25 @@ body {
 }
 
 .loading-dots::after {
-  content: '';
+  content: "";
   animation: loading 1.5s infinite;
 }
 
 @keyframes loading {
   0% {
-    content: '';
+    content: "";
   }
 
   25% {
-    content: '.';
+    content: ".";
   }
 
   50% {
-    content: '..';
+    content: "..";
   }
 
   75% {
-    content: '...';
+    content: "...";
   }
 }
 

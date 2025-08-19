@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
 import "./globals.css";
+import { LanguageProvider } from "../contexts/LanguageContext";
 
 const roboto = Roboto({
   variable: "--font-roboto",
@@ -11,7 +12,8 @@ const roboto = Roboto({
 
 export const metadata: Metadata = {
   title: "Regent Studio - 3D Creative Agency",
-  description: "Professional 3D graphics, cinematic teasers, and innovative design solutions for gaming and entertainment industry.",
+  description:
+    "Professional 3D graphics, cinematic teasers, and innovative design solutions for gaming and entertainment industry.",
 };
 
 export default function RootLayout({
@@ -21,10 +23,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${roboto.variable} antialiased`}
-      >
-        {children}
+      <body className={`${roboto.variable} antialiased`}>
+        <LanguageProvider>
+          {children}
+        </LanguageProvider>
       </body>
     </html>
   );

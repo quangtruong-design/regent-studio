@@ -1,47 +1,62 @@
-
 "use client";
 
-import { motion, useInView, useScroll, useTransform } from 'framer-motion';
-import { useRef, useState } from 'react';
+import { motion, useInView, useScroll, useTransform } from "framer-motion";
+import { useRef, useState } from "react";
+import { useLanguage } from "../contexts/LanguageContext";
+import React from "react"; // Added missing import
 
 interface TeamMember {
   name: string;
-  role: string;
   image: string;
-  bio: string;
+  bioKey: string;
 }
 
 const teamMembers: TeamMember[] = [
   {
-    name: "QUANG TRƯỜNG",
-    role: "Creative Director",
-    image: "https://api.builder.io/api/v1/image/assets/TEMP/2d2355fcfd15ca05dd14de041d6ae7ef3df01f81?placeholderIfAbsent=true&apiKey=a20fe3d689b84152a6502d95e7e72213",
-    bio: "Visionary leader with 10+ years in 3D design and creative direction."
+    name: "Lê Quang Trường",
+    image:
+      "https://api.builder.io/api/v1/image/assets/TEMP/2d2355fcfd15ca05dd14de041d6ae7ef3df01f81?placeholderIfAbsent=true&apiKey=a20fe3d689b84152a6502d95e7e72213",
+    bioKey: "leQuangTruong",
   },
   {
-    name: "MINH ĐĂNG",
-    role: "3D Artist",
-    image: "https://api.builder.io/api/v1/image/assets/TEMP/7270f34ee198dd4ab656a7a419a1bb7a0a1c9c34?placeholderIfAbsent=true&apiKey=a20fe3d689b84152a6502d95e7e72213",
-    bio: "Expert in character modeling and environmental design with passion for detail."
+    name: "Lê Quỳnh Như",
+    image:
+      "https://api.builder.io/api/v1/image/assets/TEMP/7270f34ee198dd4ab656a7a419a1bb7a0a1c9c34?placeholderIfAbsent=true&apiKey=a20fe3d689b84152a6502d95e7e72213",
+    bioKey: "leQuynhNhu",
   },
   {
-    name: "THU HẰNG",
-    role: "Motion Designer",
-    image: "https://api.builder.io/api/v1/image/assets/TEMP/15ef7c5ac1ff02d05b008d9615a59dfe216edf2b?placeholderIfAbsent=true&apiKey=a20fe3d689b84152a6502d95e7e72213",
-    bio: "Animation specialist creating compelling visual narratives and seamless motion."
+    name: "Cao Trường Kha",
+    image:
+      "https://api.builder.io/api/v1/image/assets/TEMP/15ef7c5ac1ff02d05b008d9615a59dfe216edf2b?placeholderIfAbsent=true&apiKey=a20fe3d689b84152a6502d95e7e72213",
+    bioKey: "caoTruongKha",
   },
   {
-    name: "TUẤN ANH",
-    role: "Technical Artist",
-    image: "https://api.builder.io/api/v1/image/assets/TEMP/ce01a5477a99b9c9ba0fb16b7888d1f9d5b091bb?placeholderIfAbsent=true&apiKey=a20fe3d689b84152a6502d95e7e72213",
-    bio: "Bridge between art and technology, optimizing workflows and performance."
-  }
+    name: "Nguyễn Hoài Bảo",
+    image:
+      "https://api.builder.io/api/v1/image/assets/TEMP/ce01a5477a99b9c9ba0fb16b7888d1f9d5b091bb?placeholderIfAbsent=true&apiKey=a20fe3d689b84152a6502d95e7e72213",
+    bioKey: "nguyenHoaiBao",
+  },
+  {
+    name: "Trần Văn Anh Kiệt",
+    image:
+      "https://api.builder.io/api/v1/image/assets/TEMP/ce01a5477a99b9c9ba0fb16b7888d1f9d5b091bb?placeholderIfAbsent=true&apiKey=a20fe3d689b84152a6502d95e7e72213",
+    bioKey: "tranVanAnhKiet",
+  },
+  {
+    name: "Châu Anh Thư",
+    image:
+      "https://api.builder.io/api/v1/image/assets/TEMP/ce01a5477a99b9c9ba0fb16b7888d1f9d5b091bb?placeholderIfAbsent=true&apiKey=a20fe3d689b84152a6502d95e7e72213",
+    bioKey: "chauAnhThu",
+  },
 ];
 
 export function TeamSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
   const [currentMember, setCurrentMember] = useState(0);
+  const [isAudioMuted, setIsAudioMuted] = useState(false); // false = ON, true = OFF
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const { t } = useLanguage();
   
   const isInView = useInView(sectionRef, { once: true, margin: "-100px" });
   const titleInView = useInView(titleRef, { once: true });
@@ -53,40 +68,173 @@ export function TeamSection() {
   
   const y = useTransform(scrollYProgress, [0, 1], [100, -100]);
 
+    // Auto-play audio when component mounts
+  React.useEffect(() => {
+    const audio = audioRef.current;
+    if (audio) {
+      // Set volume to a reasonable level
+      audio.volume = 0.5;
+      
+      // Add event listeners
+      audio.addEventListener('canplaythrough', () => {
+        console.log('Audio can play through');
+      });
+      
+      audio.addEventListener('error', (e) => {
+        console.error('Audio error:', e);
+      });
+      
+      audio.addEventListener('loadstart', () => {
+        console.log('Audio loading started');
+      });
+      
+      // Try to play audio when it's ready
+      const playWhenReady = () => {
+        if (audio && audio.readyState >= 2) { // HAVE_CURRENT_DATA
+          audio.play().then(() => {
+            console.log('Audio started successfully');
+            setIsAudioMuted(false);
+          }).catch(error => {
+            console.log('Auto-play prevented by browser:', error);
+            // Don't change state here, let localStorage handle it
+          });
+        } else {
+          // Wait for audio to be ready
+          setTimeout(playWhenReady, 100);
+        }
+      };
+      
+      // Start trying to play after a short delay
+      setTimeout(playWhenReady, 1000);
+    }
+  }, []);
+
+  // Persist audio state in localStorage
+  React.useEffect(() => {
+    const savedAudioState = localStorage.getItem('audioMuted');
+    if (savedAudioState !== null) {
+      setIsAudioMuted(JSON.parse(savedAudioState));
+    }
+  }, []);
+
+  // Save audio state to localStorage when it changes
+  React.useEffect(() => {
+    localStorage.setItem('audioMuted', JSON.stringify(isAudioMuted));
+  }, [isAudioMuted]);
+
+  // Toggle audio mute/unmute
+  const toggleAudio = () => {
+    const audio = audioRef.current;
+    if (audio) {
+      if (isAudioMuted) {
+        // Unmute and play
+        audio.muted = false;
+        audio.play().then(() => {
+          console.log('Audio unmuted and playing');
+          setIsAudioMuted(false);
+        }).catch(error => {
+          console.error('Failed to play audio:', error);
+        });
+      } else {
+        // Mute
+        audio.muted = true;
+        console.log('Audio muted');
+        setIsAudioMuted(true);
+      }
+    }
+  };
+
+  // Force play audio when user interacts
+  const forcePlayAudio = () => {
+    const audio = audioRef.current;
+    if (audio && isAudioMuted) {
+      audio.muted = false;
+      audio.play().then(() => {
+        console.log('Audio forced to play');
+        setIsAudioMuted(false);
+      }).catch(error => {
+        console.error('Failed to force play audio:', error);
+      });
+    }
+  };
+
   return (
     <motion.section 
       ref={sectionRef}
       className="relative min-h-screen bg-gradient-to-br from-gray-50 to-white overflow-hidden pattern-dots"
       id="team"
     >
+      {/* Background Audio Component */}
+      <div className="fixed bottom-8 right-8 z-[9999]">
+        <audio
+          ref={audioRef}
+          loop
+          preload="auto"
+          muted={false}
+          controls={false}
+          className="hidden"
+          onLoadStart={() => console.log('Audio load started')}
+          onCanPlay={() => console.log('Audio can play')}
+          onError={(e) => console.error('Audio error:', e)}
+          onLoadedData={() => console.log('Audio data loaded')}
+          onLoad={() => console.log('Audio loaded completely')}
+          onCanPlayThrough={() => console.log('Audio can play through')}
+        >
+          <source src="/audio/uplifting-inspirational-music-379534.mp3" type="audio/mpeg" />
+          <source src="/audio/uplifting-inspirational-music-379534.mp3" type="audio/mpeg" />
+          Your browser does not support the audio element.
+        </audio>
+        
+        {/* Audio Toggle Button */}
+        <motion.button
+          onClick={isAudioMuted ? forcePlayAudio : toggleAudio}
+          className={`px-3 py-6 flex items-center justify-center transition-all duration-300 rounded-full backdrop-blur-md bg-black/20 border border-white/20 ${
+            isAudioMuted 
+              ? 'text-red-400' 
+              : 'text-lime-400'
+          }`}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.95 }}
+          style={{ textOrientation: 'mixed' }}
+        >
+          <div className="flex flex-col items-center space-y-1">
+            <span className="text-sm font-bold tracking-wider">
+              {isAudioMuted ? t('audio.off') : t('audio.on')}
+            </span>
+            <span className="text-xs font-medium">
+              {t('audio.sound')}
+            </span>
+          </div>
+        </motion.button>
+      </div>
       {/* Background Elements */}
-      <motion.div 
+      <motion.div
         className="absolute top-20 right-20 w-96 h-96 bg-gradient-to-br from-lime-400/20 to-blue-500/20 rounded-full blur-3xl"
         style={{ y }}
       />
-      <motion.div 
+      <motion.div
         className="absolute bottom-20 left-20 w-64 h-64 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-full blur-3xl"
         style={{ y: useTransform(scrollYProgress, [0, 1], [-50, 50]) }}
       />
 
       <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-20 py-20">
         {/* Section Title */}
-        <motion.div 
+        <motion.div
           ref={titleRef}
           className="text-center mb-20"
           initial={{ opacity: 0, y: 50 }}
           animate={titleInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.8 }}
         >
-          <motion.h2 
-            className="text-5xl lg:text-7xl font-black text-slate-900 mb-6"
+          <motion.h2
+            className="text-5xl lg:text-7xl font-black text-white mb-6"
             initial={{ scale: 0.8 }}
             animate={titleInView ? { scale: 1 } : {}}
             transition={{ duration: 0.8, delay: 0.2 }}
           >
-            OUR <span className="gradient-text">TEAM</span>
+            {t('team.title').split(' ')[0]} <span className="gradient-text">{t('team.title').split(' ')[1]}</span>
           </motion.h2>
-          <motion.p 
+          <motion.p
             className="text-xl text-slate-600 max-w-3xl mx-auto"
             initial={{ opacity: 0 }}
             animate={titleInView ? { opacity: 1 } : {}}
@@ -97,76 +245,130 @@ export function TeamSection() {
         </motion.div>
 
         {/* Team Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-          {/* Team Members Cards */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-start">
+          {/* Team Members Cards - 3x2 Grid */}
           <motion.div 
-            className="space-y-8"
+            className="space-y-6"
             initial={{ opacity: 0, x: -50 }}
             animate={isInView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.8, delay: 0.3 }}
           >
-            {teamMembers.map((member, index) => (
-              <motion.div
-                key={member.name}
-                className={`perspective-card cursor-pointer ${
-                  currentMember === index ? 'scale-105' : ''
-                }`}
-                onClick={() => setCurrentMember(index)}
-                whileHover={{ scale: 1.02 }}
-                transition={{ duration: 0.3 }}
-              >
-                <motion.div 
-                  className={`glass-effect p-6 rounded-2xl transition-all duration-500 ${
-                    currentMember === index 
-                      ? 'bg-lime-400/10 border-lime-400/50 shadow-2xl' 
-                      : 'hover:bg-white/60'
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {teamMembers.map((member, index) => (
+                <motion.div
+                  key={member.name}
+                  className={`perspective-card cursor-pointer ${
+                    currentMember === index ? "scale-105" : ""
                   }`}
-                  whileHover={{ rotateY: 2, rotateX: 2 }}
+                  onClick={() => setCurrentMember(index)}
+                  whileHover={{ scale: 1.02 }}
+                  transition={{ duration: 0.3 }}
                 >
-                  <div className="flex items-center space-x-4">
-                    <motion.div 
-                      className="w-16 h-16 rounded-2xl bg-gradient-to-br from-lime-400 to-blue-500 flex items-center justify-center"
-                      animate={currentMember === index ? { rotate: 360 } : {}}
-                      transition={{ duration: 0.8 }}
-                    >
-                      <span className="text-white font-bold text-lg">
-                        {member.name.charAt(0)}
-                      </span>
-                    </motion.div>
-                    <div>
-                      <h3 className="text-xl font-bold text-slate-900">
-                        {member.name}
-                      </h3>
-                      <p className="text-slate-600 font-medium">{member.role}</p>
-                    </div>
-                  </div>
-                  
                   <motion.div
-                    className="mt-4 overflow-hidden"
-                    initial={false}
-                    animate={{
-                      height: currentMember === index ? "auto" : 0,
-                      opacity: currentMember === index ? 1 : 0
-                    }}
-                    transition={{ duration: 0.3 }}
+                    className={`glass-effect p-4 rounded-2xl transition-all duration-500 h-full ${
+                      currentMember === index
+                        ? "bg-lime-400/10 border-lime-400/50 shadow-2xl"
+                        : "hover:bg-white/60"
+                    }`}
+                    whileHover={{ rotateY: 2, rotateX: 2 }}
                   >
-                    <p className="text-slate-700 leading-relaxed">
-                      {member.bio}
-                    </p>
+                    <div className="flex flex-col items-center text-center space-y-3">
+                      <motion.div
+                        className="w-14 h-14 rounded-2xl bg-gradient-to-br from-lime-400 to-blue-500 flex items-center justify-center"
+                        animate={currentMember === index ? { rotate: 360 } : {}}
+                        transition={{ duration: 0.8 }}
+                      >
+                        <span className="text-white font-bold text-lg">
+                          {member.name.charAt(0)}
+                        </span>
+                      </motion.div>
+                      <div>
+                        <h3 className="text-lg font-bold text-white">
+                          {member.name}
+                        </h3>
+                        <p className="text-slate-400 font-medium text-sm mt-1">
+                          {t(`team.members.${member.bioKey}`)}
+                        </p>
+                      </div>
+                    </div>
+                    
+                    {/* Mobile Modal - Hidden on desktop */}
+                    <motion.div
+                      className="mt-4 overflow-hidden md:hidden"
+                      initial={false}
+                      animate={{
+                        height: currentMember === index ? "auto" : 0,
+                        opacity: currentMember === index ? 1 : 0
+                      }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <div className="pt-4 border-t border-white/20">
+                        {/* Member Image */}
+                        <div className="relative overflow-hidden rounded-2xl mb-4">
+                          <img
+                            src={member.image}
+                            alt={member.name}
+                            className="w-full h-48 object-cover"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                        </div>
+                        
+                        {/* Member Info */}
+                        <div className="text-center mb-4">
+                          <h3 className="text-2xl font-black text-white mb-2">
+                            {member.name}
+                          </h3>
+                        </div>
+                        
+                        {/* Member Bio */}
+                        <p className="text-slate-300 leading-relaxed text-sm text-center mb-4">
+                          {t(`team.members.${member.bioKey}`)}
+                        </p>
+                        
+                        {/* Floating Elements */}
+                        <div className="relative">
+                          <motion.div
+                            className="absolute -top-2 -right-2 w-4 h-4 bg-lime-400 rounded-full"
+                            animate={{ 
+                              scale: [1, 1.2, 1],
+                              rotate: [0, 180, 360]
+                            }}
+                            transition={{ 
+                              duration: 4, 
+                              repeat: Infinity,
+                              ease: "easeInOut"
+                            }}
+                          />
+                          <motion.div
+                            className="absolute -bottom-2 -left-2 w-3 h-3 border-2 border-blue-500 rounded-full"
+                            animate={{ 
+                              scale: [1, 1.3, 1],
+                              opacity: [0.7, 1, 0.7]
+                            }}
+                            transition={{ 
+                              duration: 3, 
+                              repeat: Infinity,
+                              ease: "easeInOut",
+                              delay: 1
+                            }}
+                          />
+                        </div>
+                      </div>
+                    </motion.div>
                   </motion.div>
                 </motion.div>
-              </motion.div>
-            ))}
+              ))}
+            </div>
           </motion.div>
 
-          {/* Featured Member Display */}
+          {/* Featured Member Display - Hidden on mobile */}
           <motion.div 
-            className="relative"
+            className="relative hidden md:block"
             initial={{ opacity: 0, x: 50 }}
             animate={isInView ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.8, delay: 0.5 }}
           >
-            <motion.div 
+            <motion.div
               className="relative perspective-card"
               key={currentMember}
               initial={{ opacity: 0, rotateY: 90 }}
@@ -174,7 +376,7 @@ export function TeamSection() {
               transition={{ duration: 0.6 }}
             >
               {/* Main Image */}
-              <motion.div 
+              <motion.div
                 className="relative overflow-hidden rounded-3xl shadow-2xl"
                 whileHover={{ scale: 1.05, rotateY: 5 }}
                 transition={{ duration: 0.4 }}
@@ -185,9 +387,9 @@ export function TeamSection() {
                   className="w-full h-[500px] object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                
+
                 {/* Member Info Overlay */}
-                <motion.div 
+                <motion.div
                   className="absolute bottom-6 left-6 right-6 text-white"
                   initial={{ y: 20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
@@ -196,36 +398,33 @@ export function TeamSection() {
                   <h3 className="text-3xl font-black mb-2">
                     {teamMembers[currentMember].name}
                   </h3>
-                  <p className="text-lime-400 font-semibold text-lg">
-                    {teamMembers[currentMember].role}
-                  </p>
                 </motion.div>
               </motion.div>
 
               {/* Floating Elements */}
               <motion.div
                 className="absolute -top-4 -right-4 w-8 h-8 bg-lime-400 rounded-full"
-                animate={{ 
+                animate={{
                   scale: [1, 1.2, 1],
-                  rotate: [0, 180, 360]
+                  rotate: [0, 180, 360],
                 }}
-                transition={{ 
-                  duration: 4, 
+                transition={{
+                  duration: 4,
                   repeat: Infinity,
-                  ease: "easeInOut"
+                  ease: "easeInOut",
                 }}
               />
               <motion.div
                 className="absolute -bottom-4 -left-4 w-6 h-6 border-2 border-blue-500 rounded-full"
-                animate={{ 
+                animate={{
                   scale: [1, 1.3, 1],
-                  opacity: [0.7, 1, 0.7]
+                  opacity: [0.7, 1, 0.7],
                 }}
-                transition={{ 
-                  duration: 3, 
+                transition={{
+                  duration: 3,
                   repeat: Infinity,
                   ease: "easeInOut",
-                  delay: 1
+                  delay: 1,
                 }}
               />
             </motion.div>
@@ -233,7 +432,7 @@ export function TeamSection() {
         </div>
 
         {/* Team Stats */}
-        <motion.div 
+        <motion.div
           className="mt-20 grid grid-cols-2 lg:grid-cols-4 gap-8"
           initial={{ opacity: 0, y: 50 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
@@ -243,24 +442,24 @@ export function TeamSection() {
             { number: "50+", label: "Projects Completed" },
             { number: "5+", label: "Years Experience" },
             { number: "20+", label: "Happy Clients" },
-            { number: "100%", label: "Satisfaction Rate" }
+            { number: "100%", label: "Satisfaction Rate" },
           ].map((stat, index) => (
-            <motion.div 
+            <motion.div
               key={stat.label}
               className="text-center glass-effect p-6 rounded-2xl hover-lift"
               initial={{ scale: 0.8, opacity: 0 }}
               animate={isInView ? { scale: 1, opacity: 1 } : {}}
               transition={{ duration: 0.5, delay: 0.8 + index * 0.1 }}
             >
-              <motion.div 
+              <motion.div
                 className="text-3xl lg:text-4xl font-black gradient-text mb-2"
                 initial={{ scale: 0 }}
                 animate={isInView ? { scale: 1 } : {}}
-                transition={{ 
-                  duration: 0.8, 
+                transition={{
+                  duration: 0.8,
                   delay: 1 + index * 0.1,
                   type: "spring",
-                  bounce: 0.5
+                  bounce: 0.5,
                 }}
               >
                 {stat.number}
@@ -271,7 +470,7 @@ export function TeamSection() {
         </motion.div>
 
         {/* CTA Button */}
-        <motion.div 
+        <motion.div
           className="text-center mt-16"
           initial={{ opacity: 0, y: 50 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
@@ -280,10 +479,13 @@ export function TeamSection() {
           <motion.a
             href="#member-profile"
             className="btn-modern inline-block text-lg px-12 py-4"
-            whileHover={{ scale: 1.05, boxShadow: "0 20px 40px rgba(163, 230, 53, 0.4)" }}
+            whileHover={{
+              scale: 1.05,
+              boxShadow: "0 20px 40px rgba(163, 230, 53, 0.4)",
+            }}
             whileTap={{ scale: 0.95 }}
           >
-            Join Our Team
+            {t('buttons.joinOurTeam')}
           </motion.a>
         </motion.div>
       </div>

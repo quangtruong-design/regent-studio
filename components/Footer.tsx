@@ -4,6 +4,7 @@
 import { motion, useInView } from 'framer-motion';
 import { useRef, useState } from 'react';
 import { ContactForm } from './ContactForm';
+import { useLanguage } from '../contexts/LanguageContext';
 import Image from 'next/image';
 
 const footerLinks = [
@@ -58,6 +59,7 @@ export function Footer() {
   const isInView = useInView(footerRef, { once: true, margin: "-100px" });
   const [isContactOpen, setIsContactOpen] = useState(false);
   const [isLogoHovered, setIsLogoHovered] = useState(false);
+  const { t } = useLanguage();
 
   return (
     <motion.footer 
@@ -235,7 +237,7 @@ export function Footer() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                Get In Touch
+                {t('buttons.getInTouch')}
               </motion.button>
             </motion.div>
           </div>

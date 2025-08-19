@@ -72,7 +72,7 @@ export function ContactForm({ isOpen, onClose }: ContactFormProps) {
         {/* Close Button */}
         <motion.button
           onClick={onClose}
-          className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full glass-effect hover-lift"
+          className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full glass-effect hover-lift cursor-pointer"
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
         >
