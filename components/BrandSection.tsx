@@ -24,7 +24,11 @@ const services = [
   }
 ];
 
-export function BrandSection() {
+interface BrandSectionProps {
+  setIsVideoOpen: (isOpen: boolean) => void;
+}
+
+export function BrandSection({ setIsVideoOpen }: BrandSectionProps) {
   const sectionRef = useRef<HTMLElement>(null);
   const brandTitleRef = useRef<HTMLDivElement>(null);
   const businessTitleRef = useRef<HTMLDivElement>(null);
@@ -316,14 +320,14 @@ export function BrandSection() {
             {t('buttons.startYourProject')}
           </motion.a>
           
-          <motion.a
-            href="#portfolio"
+          <motion.button
+            onClick={() => setIsVideoOpen(true)}
             className="glass-effect px-12 py-4 rounded-xl text-white font-semibold hover-lift text-lg inline-block"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
             {t('buttons.viewOurWork')}
-          </motion.a>
+          </motion.button>
         </motion.div>
       </div>
     </motion.section>

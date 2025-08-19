@@ -59,6 +59,7 @@ export function Footer() {
   const isInView = useInView(footerRef, { once: true, margin: "-100px" });
   const [isContactOpen, setIsContactOpen] = useState(false);
   const [isLogoHovered, setIsLogoHovered] = useState(false);
+  const [newsletterEmail, setNewsletterEmail] = useState('');
   const { t } = useLanguage();
 
   return (
@@ -229,6 +230,8 @@ export function Footer() {
               <input
                 type="email"
                 placeholder="Enter your email"
+                value={newsletterEmail}
+                onChange={(e) => setNewsletterEmail(e.target.value)}
                 className="flex-1 px-6 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-gray-400 focus:outline-none focus:border-lime-400 transition-colors"
               />
               <motion.button
@@ -286,6 +289,7 @@ export function Footer() {
       <ContactForm 
         isOpen={isContactOpen} 
         onClose={() => setIsContactOpen(false)} 
+        initialEmail={newsletterEmail}
       />
     </motion.footer>
   );

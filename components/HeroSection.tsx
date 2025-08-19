@@ -44,12 +44,16 @@ function LogoComponent() {
   );
 }
 
-export function HeroSection() {
+interface HeroSectionProps {
+  isVideoOpen: boolean;
+  setIsVideoOpen: (isOpen: boolean) => void;
+}
+
+export function HeroSection({ isVideoOpen, setIsVideoOpen }: HeroSectionProps) {
   const sectionRef = useRef<HTMLElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
   const [isContactOpen, setIsContactOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isVideoOpen, setIsVideoOpen] = useState(false);
   const [isHeaderSticky, setIsHeaderSticky] = useState(false);
   const { t } = useLanguage();
 

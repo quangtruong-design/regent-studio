@@ -8,6 +8,7 @@ import { EMAILJS_CONFIG } from '@/lib/emailjs-config';
 interface ContactFormProps {
   isOpen: boolean;
   onClose: () => void;
+  initialEmail?: string;
 }
 
 interface FormData {
@@ -22,13 +23,13 @@ interface FormErrors {
   message?: string;
 }
 
-export function ContactForm({ isOpen, onClose }: ContactFormProps) {
+export function ContactForm({ isOpen, onClose, initialEmail }: ContactFormProps) {
   const formRef = useRef<HTMLFormElement>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [formData, setFormData] = useState<FormData>({
     from_name: '',
-    from_email: '',
+    from_email: initialEmail || '',
     message: ''
   });
   const [errors, setErrors] = useState<FormErrors>({});
@@ -37,6 +38,16 @@ export function ContactForm({ isOpen, onClose }: ContactFormProps) {
   useEffect(() => {
     emailjs.init(EMAILJS_CONFIG.PUBLIC_KEY);
   }, []);
+
+  // Update form data when initialEmail changes
+  useEffect(() => {
+    if (initialEmail) {
+      setFormData(prev => ({
+        ...prev,
+        from_email: initialEmail
+      }));
+    }
+  }, [initialEmail]);
 
 
 
