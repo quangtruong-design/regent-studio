@@ -180,8 +180,8 @@ export function TeamSection() {
           onLoad={() => console.log('Audio loaded completely')}
           onCanPlayThrough={() => console.log('Audio can play through')}
         >
-          <source src="/audio/uplifting-inspirational-music-379534.mp3" type="audio/mpeg" />
-          <source src="/audio/uplifting-inspirational-music-379534.mp3" type="audio/mpeg" />
+          <source src="/audios/uplifting-inspirational-music-379534.mp3" type="audio/mpeg" />
+          <source src="/audios/uplifting-inspirational-music-379534.mp3" type="audio/mpeg" />
           Your browser does not support the audio element.
         </audio>
         
