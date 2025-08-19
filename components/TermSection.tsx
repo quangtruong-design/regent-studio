@@ -439,9 +439,9 @@ export function TeamSection() {
           transition={{ duration: 0.8, delay: 0.7 }}
         >
           {[
-            { number: "50+", label: "Projects Completed" },
-            { number: "5+", label: "Years Experience" },
-            { number: "20+", label: "Happy Clients" },
+            { number: "1", label: "Projects Completed" },
+            { number: "1", label: "Years Experience" },
+            { number: "1", label: "Happy Clients" },
             { number: "100%", label: "Satisfaction Rate" },
           ].map((stat, index) => (
             <motion.div

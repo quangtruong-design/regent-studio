@@ -70,6 +70,31 @@ export function HeroSection() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Handle keyboard events for menu and video modal closing
+  React.useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        if (isMenuOpen) {
+          setIsMenuOpen(false);
+        }
+        if (isVideoOpen) {
+          setIsVideoOpen(false);
+        }
+      }
+    };
+
+    if (isMenuOpen || isVideoOpen) {
+      document.addEventListener('keydown', handleKeyDown);
+      // Prevent body scroll when modal is open
+      document.body.style.overflow = 'hidden';
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = 'unset';
+    };
+  }, [isMenuOpen, isVideoOpen]);
+
   return (
     <>
       {/* Header - Absolute Top Layer */}
@@ -336,7 +361,10 @@ export function HeroSection() {
           {/* Close Button - Outside content wrapper to ensure it works */}
           <div className="absolute top-8 right-8 z-20">
             <motion.button
-              onClick={() => setIsMenuOpen(false)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsMenuOpen(false);
+              }}
               className="w-12 h-12 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white hover:bg-white/20 transition-colors cursor-pointer"
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
@@ -484,17 +512,25 @@ export function HeroSection() {
 
       {/* Video Modal - Absolute Top Layer */}
       {isVideoOpen && (
-        <div className="z-[9999] fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center modal-container">
-          <div className="relative w-full max-w-6xl mx-4">
-            {/* Close Button */}
+        <motion.div 
+          className="z-[9999] fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center modal-container p-4"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          <div 
+            className="relative w-full max-w-6xl mx-auto"
+          >
+            {/* Small X Close Button */}
             <motion.button
               onClick={() => setIsVideoOpen(false)}
-              className="absolute -top-12 right-0 w-12 h-12 rounded-full bg-white/10 border border-white/20 flex items-center justify-center text-white hover:bg-white/20 transition-colors cursor-pointer z-10"
+              className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/20 border border-white/30 flex items-center justify-center text-white hover:bg-white/30 transition-colors cursor-pointer z-50 shadow-lg"
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
             >
               <svg
-                className="w-6 h-6"
+                className="w-5 h-5"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -515,27 +551,20 @@ export function HeroSection() {
               animate={{ scale: 1, opacity: 1 }}
               transition={{ duration: 0.5, ease: "easeOut" }}
             >
-              <iframe
-                className="w-full h-full"
-                src="https://www.youtube.com/embed/BCfk8PYOGSU?autoplay=1&mute=0&loop=1&playlist=BCfk8PYOGSU&controls=0&rel=0&showinfo=0&modestbranding=1"
-                title="Regent Studio Video"
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              />
+              <video 
+                className="w-full h-full object-cover" 
+                autoPlay 
+                loop 
+                controls={false} 
+                playsInline 
+                preload="metadata"
+              > 
+                <source src="https://github.com/quangtruong-design/regent-studio/releases/download/v1.0.0/shot_1.mp4" type="video/mp4" /> 
+                Your browser does not support the video tag. 
+              </video>
             </motion.div>
-
-            {/* Video Title */}
-            <motion.h3
-              className="text-2xl font-bold text-white text-center mt-6"
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-            >
-              {t("video.title")}
-            </motion.h3>
           </div>
-        </div>
+        </motion.div>
       )}
 
       {/* Contact Form Modal - Absolute Top Layer */}
