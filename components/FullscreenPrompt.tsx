@@ -10,9 +10,7 @@ interface FullscreenPromptProps {
 
 export function FullscreenPrompt({ onFullscreenEnter }: FullscreenPromptProps) {
   const [isVisible, setIsVisible] = useState(true);
-  const [isFullscreen, setIsFullscreen] = useState(false);
   const [showContent, setShowContent] = useState(false);
-  const { t } = useLanguage();
 
   // Show content after initial animations
   useEffect(() => {
@@ -27,12 +25,11 @@ export function FullscreenPrompt({ onFullscreenEnter }: FullscreenPromptProps) {
   useEffect(() => {
     const checkFullscreen = () => {
       const fullscreenElement = document.fullscreenElement || 
-                               (document as any).webkitFullscreenElement || 
-                               (document as any).mozFullScreenElement || 
-                               (document as any).msFullscreenElement;
+                               (document as Document & { webkitFullscreenElement?: Element }).webkitFullscreenElement || 
+                               (document as Document & { mozFullScreenElement?: Element }).mozFullScreenElement || 
+                               (document as Document & { msFullscreenElement?: Element }).msFullscreenElement;
       
       if (fullscreenElement) {
-        setIsFullscreen(true);
         setIsVisible(false);
         onFullscreenEnter();
       }

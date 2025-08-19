@@ -16,9 +16,9 @@ export default function Home() {
   useEffect(() => {
     const checkFullscreen = () => {
       const fullscreenElement = document.fullscreenElement || 
-                               (document as any).webkitFullscreenElement || 
-                               (document as any).mozFullScreenElement || 
-                               (document as any).msFullscreenElement;
+                               (document as Document & { webkitFullscreenElement?: Element }).webkitFullscreenElement || 
+                               (document as Document & { mozFullScreenElement?: Element }).mozFullScreenElement || 
+                               (document as Document & { msFullscreenElement?: Element }).msFullscreenElement;
       
       if (fullscreenElement) {
         setIsFullscreenEntered(true);
@@ -39,9 +39,9 @@ export default function Home() {
   useEffect(() => {
     const handleFullscreenChange = () => {
       const fullscreenElement = document.fullscreenElement || 
-                               (document as any).webkitFullscreenElement || 
-                               (document as any).mozFullScreenElement || 
-                               (document as any).msFullscreenElement;
+                               (document as Document & { webkitFullscreenElement?: Element }).webkitFullscreenElement || 
+                               (document as Document & { mozFullScreenElement?: Element }).mozFullScreenElement || 
+                               (document as Document & { msFullscreenElement?: Element }).msFullscreenElement;
       
       if (!fullscreenElement && isFullscreenEntered) {
         setIsFullscreenEntered(false);

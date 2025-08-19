@@ -114,7 +114,7 @@ export function ContactForm({ isOpen, onClose }: ContactFormProps) {
         time: new Date().toLocaleString(), // Template expects {{time}}
       };
       
-      const mainEmailResult = await emailjs.send(
+      await emailjs.send(
         EMAILJS_CONFIG.SERVICE_ID,
         EMAILJS_CONFIG.TEMPLATE_ID,
         mainEmailData,
@@ -127,7 +127,7 @@ export function ContactForm({ isOpen, onClose }: ContactFormProps) {
         email: formData.from_email, // This will be used as the recipient
       };
       
-      const autoReplyResult = await emailjs.send(
+      await emailjs.send(
         EMAILJS_CONFIG.SERVICE_ID,
         EMAILJS_CONFIG.AUTO_REPLY_TEMPLATE_ID,
         autoReplyData,
@@ -143,7 +143,7 @@ export function ContactForm({ isOpen, onClose }: ContactFormProps) {
         setSubmitStatus('idle');
       }, 3000);
       
-             } catch (error) {
+             } catch {
       setSubmitStatus('error');
     } finally {
       setIsSubmitting(false);

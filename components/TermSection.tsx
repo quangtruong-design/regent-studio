@@ -84,7 +84,7 @@ export function TeamSection({ audioEnabled = false }: TeamSectionProps) {
         audio.play().then(() => {
           setIsAudioMuted(false);
           setHasUserInteracted(true);
-        }).catch(error => {
+        }).catch(() => {
           // Autoplay failed, show prompt after delay
           setTimeout(() => {
             if (!hasUserInteracted) {
@@ -125,7 +125,7 @@ export function TeamSection({ audioEnabled = false }: TeamSectionProps) {
         setIsAudioMuted(false);
         setHasUserInteracted(true);
         setShowAudioPrompt(false);
-      }).catch(error => {
+      }).catch(() => {
         // Handle play error silently
       });
     }
