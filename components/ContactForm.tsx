@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from 'framer-motion';
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import emailjs from '@emailjs/browser';
 import { EMAILJS_CONFIG } from '@/lib/emailjs-config';
 
@@ -10,34 +10,140 @@ interface ContactFormProps {
   onClose: () => void;
 }
 
+interface FormData {
+  from_name: string;
+  from_email: string;
+  message: string;
+}
+
+interface FormErrors {
+  from_name?: string;
+  from_email?: string;
+  message?: string;
+}
+
 export function ContactForm({ isOpen, onClose }: ContactFormProps) {
   const formRef = useRef<HTMLFormElement>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [formData, setFormData] = useState<FormData>({
+    from_name: '',
+    from_email: '',
+    message: ''
+  });
+  const [errors, setErrors] = useState<FormErrors>({});
+
+  // Initialize EmailJS
+  useEffect(() => {
+    emailjs.init(EMAILJS_CONFIG.PUBLIC_KEY);
+  }, []);
+
+
+
+  // Email validation function
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  // Form validation function
+  const validateForm = (): boolean => {
+    const newErrors: FormErrors = {};
+
+    // Name validation
+    if (!formData.from_name.trim()) {
+      newErrors.from_name = 'Name is required';
+    } else if (formData.from_name.trim().length < 2) {
+      newErrors.from_name = 'Name must be at least 2 characters';
+    }
+
+    // Email validation
+    if (!formData.from_email.trim()) {
+      newErrors.from_email = 'Email is required';
+    } else if (!validateEmail(formData.from_email)) {
+      newErrors.from_email = 'Please enter a valid email address';
+    }
+
+    // Message validation
+    if (!formData.message.trim()) {
+      newErrors.message = 'Message is required';
+    } else if (formData.message.trim().length < 10) {
+      newErrors.message = 'Message must be at least 10 characters';
+    } else if (formData.message.trim().length > 1000) {
+      newErrors.message = 'Message must be less than 1000 characters';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  // Handle input changes
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+
+    // Clear error when user starts typing
+    if (errors[name as keyof FormErrors]) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: undefined
+      }));
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formRef.current) return;
+    
+    if (!validateForm()) {
+      return;
+    }
 
     setIsSubmitting(true);
     setSubmitStatus('idle');
 
-    try {
-      await emailjs.sendForm(
+             try {
+      // Send the main contact form email using send() method
+      const mainEmailData = {
+        name: formData.from_name, // Template expects {{name}}
+        email: formData.from_email, // Template expects {{email}} for reply_to
+        message: formData.message, // Template expects {{message}}
+        title: 'New Contact Form Submission', // Template expects {{title}} for subject
+        time: new Date().toLocaleString(), // Template expects {{time}}
+      };
+      
+      const mainEmailResult = await emailjs.send(
         EMAILJS_CONFIG.SERVICE_ID,
         EMAILJS_CONFIG.TEMPLATE_ID,
-        formRef.current,
+        mainEmailData,
+        EMAILJS_CONFIG.PUBLIC_KEY
+      );
+
+      // Send auto-reply email to the user
+      const autoReplyData = {
+        name: formData.from_name,
+        email: formData.from_email, // This will be used as the recipient
+      };
+      
+      const autoReplyResult = await emailjs.send(
+        EMAILJS_CONFIG.SERVICE_ID,
+        EMAILJS_CONFIG.AUTO_REPLY_TEMPLATE_ID,
+        autoReplyData,
         EMAILJS_CONFIG.PUBLIC_KEY
       );
       
       setSubmitStatus('success');
-      formRef.current.reset();
+      setFormData({ from_name: '', from_email: '', message: '' });
+      setErrors({});
+      
       setTimeout(() => {
         onClose();
         setSubmitStatus('idle');
-      }, 2000);
-    } catch (error) {
-      console.error('EmailJS error:', error);
+      }, 3000);
+      
+             } catch (error) {
       setSubmitStatus('error');
     } finally {
       setIsSubmitting(false);
@@ -102,8 +208,8 @@ export function ContactForm({ isOpen, onClose }: ContactFormProps) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-        >
-          <div className="grid grid-cols-1 gap-4">
+                 >
+           <div className="grid grid-cols-1 gap-4">
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -116,10 +222,24 @@ export function ContactForm({ isOpen, onClose }: ContactFormProps) {
                 type="text"
                 id="from_name"
                 name="from_name"
-                required
-                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-lime-400 transition-colors text-sm"
+                value={formData.from_name}
+                onChange={handleInputChange}
+                className={`w-full px-4 py-3 bg-white/10 border rounded-lg text-white placeholder-gray-400 focus:outline-none transition-colors text-sm ${
+                  errors.from_name 
+                    ? 'border-red-400 focus:border-red-400' 
+                    : 'border-white/20 focus:border-lime-400'
+                }`}
                 placeholder="John Doe"
               />
+              {errors.from_name && (
+                <motion.p
+                  className="text-red-400 text-xs mt-1"
+                  initial={{ opacity: 0, y: -5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                >
+                  {errors.from_name}
+                </motion.p>
+              )}
             </motion.div>
 
             <motion.div
@@ -134,11 +254,26 @@ export function ContactForm({ isOpen, onClose }: ContactFormProps) {
                 type="email"
                 id="from_email"
                 name="from_email"
-                required
-                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-lime-400 transition-colors text-sm"
+                value={formData.from_email}
+                onChange={handleInputChange}
+                className={`w-full px-4 py-3 bg-white/10 border rounded-lg text-white placeholder-gray-400 focus:outline-none transition-colors text-sm ${
+                  errors.from_email 
+                    ? 'border-red-400 focus:border-red-400' 
+                    : 'border-white/20 focus:border-lime-400'
+                }`}
                 placeholder="john@example.com"
               />
+              {errors.from_email && (
+                <motion.p
+                  className="text-red-400 text-xs mt-1"
+                  initial={{ opacity: 0, y: -5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                >
+                  {errors.from_email}
+                </motion.p>
+              )}
             </motion.div>
+
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -150,11 +285,25 @@ export function ContactForm({ isOpen, onClose }: ContactFormProps) {
               <textarea
                 id="message"
                 name="message"
-                required
+                value={formData.message}
+                onChange={handleInputChange}
                 rows={4}
-                className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-lime-400 transition-colors resize-none text-sm"
+                className={`w-full px-4 py-3 bg-white/10 border rounded-lg text-white placeholder-gray-400 focus:outline-none resize-none text-sm ${
+                  errors.message 
+                    ? 'border-red-400 focus:border-red-400' 
+                    : 'border-white/20 focus:border-lime-400'
+                }`}
                 placeholder="Tell us about your project..."
               />
+              {errors.message && (
+                <motion.p
+                  className="text-red-400 text-xs mt-1"
+                  initial={{ opacity: 0, y: -5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                >
+                  {errors.message}
+                </motion.p>
+              )}
             </motion.div>
           </div>
 
@@ -191,7 +340,7 @@ export function ContactForm({ isOpen, onClose }: ContactFormProps) {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
               >
-                ✅ Message sent successfully! We&apos;ll get back to you soon.
+                ✅ Message sent successfully! Check your email for confirmation.
               </motion.p>
             )}
 
