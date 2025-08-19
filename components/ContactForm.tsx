@@ -377,7 +377,7 @@ export function ContactForm({ isOpen, onClose }: ContactFormProps) {
               href="tel:+1234567890"
               className="text-lime-400 hover:text-white transition-colors"
             >
-              📞 +1 (234) 567-890
+              📞 +84 (794) 234-327
             </a>
           </div>
         </motion.div>
