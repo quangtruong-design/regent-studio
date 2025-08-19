@@ -50,11 +50,17 @@ const teamMembers: TeamMember[] = [
   },
 ];
 
-export function TeamSection() {
+interface TeamSectionProps {
+  audioEnabled?: boolean;
+}
+
+export function TeamSection({ audioEnabled = false }: TeamSectionProps) {
   const sectionRef = useRef<HTMLElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
   const [currentMember, setCurrentMember] = useState(0);
-  const [isAudioMuted, setIsAudioMuted] = useState(false); // false = ON, true = OFF
+  const [isAudioMuted, setIsAudioMuted] = useState(true);
+  const [hasUserInteracted, setHasUserInteracted] = useState(false);
+  const [showAudioPrompt, setShowAudioPrompt] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
   const { t } = useLanguage();
   
@@ -68,93 +74,72 @@ export function TeamSection() {
   
   const y = useTransform(scrollYProgress, [0, 1], [100, -100]);
 
-    // Auto-play audio when component mounts
   React.useEffect(() => {
     const audio = audioRef.current;
-    if (audio) {
-      // Set volume to a reasonable level
-      audio.volume = 0.5;
+    if (audio && audioEnabled) {
+      audio.volume = 0.3;
       
-      // Add event listeners
-      audio.addEventListener('canplaythrough', () => {
-        console.log('Audio can play through');
-      });
-      
-      audio.addEventListener('error', (e) => {
-        console.error('Audio error:', e);
-      });
-      
-      audio.addEventListener('loadstart', () => {
-        console.log('Audio loading started');
-      });
-      
-      // Try to play audio when it's ready
-      const playWhenReady = () => {
-        if (audio && audio.readyState >= 2) { // HAVE_CURRENT_DATA
-          audio.play().then(() => {
-            console.log('Audio started successfully');
-            setIsAudioMuted(false);
-          }).catch(error => {
-            console.log('Auto-play prevented by browser:', error);
-            // Don't change state here, let localStorage handle it
-          });
-        } else {
-          // Wait for audio to be ready
-          setTimeout(playWhenReady, 100);
-        }
+      // Try autoplay first
+      const attemptAutoPlay = () => {
+        audio.play().then(() => {
+          setIsAudioMuted(false);
+          setHasUserInteracted(true);
+        }).catch(error => {
+          // Autoplay failed, show prompt after delay
+          setTimeout(() => {
+            if (!hasUserInteracted) {
+              setShowAudioPrompt(true);
+            }
+          }, 3000);
+        });
       };
-      
-      // Start trying to play after a short delay
-      setTimeout(playWhenReady, 1000);
+
+      // Wait for audio to load
+      if (audio.readyState >= 2) {
+        attemptAutoPlay();
+      } else {
+        audio.addEventListener('canplaythrough', attemptAutoPlay, { once: true });
+      }
     }
-  }, []);
+  }, [hasUserInteracted, audioEnabled]);
 
-  // Persist audio state in localStorage
+  // Keep audio playing even when audioEnabled changes (e.g., exiting fullscreen)
   React.useEffect(() => {
-    const savedAudioState = localStorage.getItem('audioMuted');
-    if (savedAudioState !== null) {
-      setIsAudioMuted(JSON.parse(savedAudioState));
+    const audio = audioRef.current;
+    if (audio && audioEnabled && !isAudioMuted) {
+      // If audio was playing and we're re-enabling, continue playing
+      if (audio.paused) {
+        audio.play().catch(() => {
+          // Silent error handling
+        });
+      }
     }
-  }, []);
+  }, [audioEnabled, isAudioMuted]);
 
-  // Save audio state to localStorage when it changes
-  React.useEffect(() => {
-    localStorage.setItem('audioMuted', JSON.stringify(isAudioMuted));
-  }, [isAudioMuted]);
 
-  // Toggle audio mute/unmute
+
+         const enableAudio = () => {
+    const audio = audioRef.current;
+    if (audio) {
+      audio.play().then(() => {
+        setIsAudioMuted(false);
+        setHasUserInteracted(true);
+        setShowAudioPrompt(false);
+      }).catch(error => {
+        // Handle play error silently
+      });
+    }
+  };
+
   const toggleAudio = () => {
     const audio = audioRef.current;
     if (audio) {
       if (isAudioMuted) {
-        // Unmute and play
-        audio.muted = false;
-        audio.play().then(() => {
-          console.log('Audio unmuted and playing');
-          setIsAudioMuted(false);
-        }).catch(error => {
-          console.error('Failed to play audio:', error);
-        });
+        enableAudio();
       } else {
-        // Mute
-        audio.muted = true;
-        console.log('Audio muted');
+        audio.pause();
         setIsAudioMuted(true);
       }
-    }
-  };
-
-  // Force play audio when user interacts
-  const forcePlayAudio = () => {
-    const audio = audioRef.current;
-    if (audio && isAudioMuted) {
-      audio.muted = false;
-      audio.play().then(() => {
-        console.log('Audio forced to play');
-        setIsAudioMuted(false);
-      }).catch(error => {
-        console.error('Failed to force play audio:', error);
-      });
     }
   };
 
@@ -164,49 +149,81 @@ export function TeamSection() {
       className="relative min-h-screen bg-gradient-to-br from-gray-50 to-white overflow-hidden pattern-dots"
       id="team"
     >
-      {/* Background Audio Component */}
-      <div className="fixed bottom-8 right-8 z-[9999]">
-        <audio
-          ref={audioRef}
-          loop
-          preload="auto"
-          muted={false}
-          controls={false}
-          className="hidden"
-          onLoadStart={() => console.log('Audio load started')}
-          onCanPlay={() => console.log('Audio can play')}
-          onError={(e) => console.error('Audio error:', e)}
-          onLoadedData={() => console.log('Audio data loaded')}
-          onLoad={() => console.log('Audio loaded completely')}
-          onCanPlayThrough={() => console.log('Audio can play through')}
-        >
-          <source src="/audios/uplifting-inspirational-music-379534.mp3" type="audio/mpeg" />
-          <source src="/audios/uplifting-inspirational-music-379534.mp3" type="audio/mpeg" />
-          Your browser does not support the audio element.
-        </audio>
-        
-        {/* Audio Toggle Button */}
-        <motion.button
-          onClick={isAudioMuted ? forcePlayAudio : toggleAudio}
-          className={`px-3 py-6 flex items-center justify-center transition-all duration-300 rounded-full backdrop-blur-md bg-black/20 border border-white/20 ${
-            isAudioMuted 
-              ? 'text-red-400' 
-              : 'text-lime-400'
-          }`}
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.95 }}
-          style={{ textOrientation: 'mixed' }}
-        >
-          <div className="flex flex-col items-center space-y-1">
-            <span className="text-sm font-bold tracking-wider">
-              {isAudioMuted ? t('audio.off') : t('audio.on')}
-            </span>
-            <span className="text-xs font-medium">
-              {t('audio.sound')}
-            </span>
-          </div>
-        </motion.button>
-      </div>
+             {/* Background Audio Component - Only show when audio is enabled */}
+       {audioEnabled && (
+         <div className="fixed bottom-8 right-8 z-[9999]">
+           <audio
+             ref={audioRef}
+             loop
+             preload="auto"
+             muted={false}
+             controls={false}
+             className="hidden"
+           >
+             <source src="/audios/uplifting-inspirational-music-379534.mp3" type="audio/mpeg" />
+             <source src="/audios/uplifting-inspirational-music-379534.mp3" type="audio/mpeg" />
+             Your browser does not support the audio element.
+           </audio>
+           
+           {/* Audio Toggle Button */}
+           <motion.button
+             onClick={toggleAudio}
+             className={`px-3 py-6 flex items-center justify-center transition-all duration-300 rounded-full backdrop-blur-md bg-black/20 border border-white/20 ${
+               isAudioMuted 
+                 ? 'text-red-400' 
+                 : 'text-lime-400'
+             }`}
+             whileHover={{ scale: 1.1 }}
+             whileTap={{ scale: 0.95 }}
+             style={{ textOrientation: 'mixed' }}
+             title={isAudioMuted ? "Click to enable audio" : "Click to mute audio"}
+           >
+             <div className="flex flex-col items-center space-y-1">
+               <span className="text-sm font-bold tracking-wider">
+                 {isAudioMuted ? t('audio.off') : t('audio.on')}
+               </span>
+               <span className="text-xs font-medium">
+                 {t('audio.sound')}
+               </span>
+             </div>
+           </motion.button>
+
+           {/* Audio Prompt */}
+           {showAudioPrompt && (
+             <motion.div
+               className="absolute bottom-20 right-0 w-64 p-4 glass-effect rounded-2xl border border-lime-400/30"
+               initial={{ opacity: 0, y: 20, scale: 0.8 }}
+               animate={{ opacity: 1, y: 0, scale: 1 }}
+               exit={{ opacity: 0, y: 20, scale: 0.8 }}
+               transition={{ duration: 0.3 }}
+             >
+               <div className="text-center">
+                 <p className="text-white text-sm mb-3">
+                   Enable background music for a better experience?
+                 </p>
+                 <div className="flex space-x-2">
+                   <motion.button
+                     onClick={enableAudio}
+                     className="px-4 py-2 bg-lime-400 text-black rounded-lg text-sm font-medium"
+                     whileHover={{ scale: 1.05 }}
+                     whileTap={{ scale: 0.95 }}
+                   >
+                     Enable
+                   </motion.button>
+                   <motion.button
+                     onClick={() => setShowAudioPrompt(false)}
+                     className="px-4 py-2 bg-white/10 text-white rounded-lg text-sm font-medium"
+                     whileHover={{ scale: 1.05 }}
+                     whileTap={{ scale: 0.95 }}
+                   >
+                     Later
+                   </motion.button>
+                 </div>
+               </div>
+             </motion.div>
+           )}
+         </div>
+       )}
       {/* Background Elements */}
       <motion.div
         className="absolute top-20 right-20 w-96 h-96 bg-gradient-to-br from-lime-400/20 to-blue-500/20 rounded-full blur-3xl"
