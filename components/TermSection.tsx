@@ -73,7 +73,7 @@ export function TeamSection() {
     const audio = audioRef.current;
     if (audio) {
       // Set volume to a reasonable level
-      audio.volume = 0.5;
+      audio.volume = 0.2;
       
       // Add event listeners
       audio.addEventListener('canplaythrough', () => {
