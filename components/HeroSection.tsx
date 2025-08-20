@@ -420,8 +420,25 @@ export function HeroSection({ isVideoOpen, setIsVideoOpen }: HeroSectionProps) {
                       className="block text-4xl font-bold text-white hover:text-lime-400 transition-colors duration-500 cursor-pointer text-left relative"
                       onClick={() => {
                         if (item === t("menu.products")) {
-                          // Open video modal for PRODUCTS
                           setIsVideoOpen(true);
+                        }
+                        if (item === t("menu.aboutUs")) {
+                          const target = document.getElementById('about');
+                          if (target) {
+                            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                          } else {
+                            window.location.hash = '#about';
+                          }
+                        }
+                        if (item === t("menu.home")) {
+                          window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }
+                        if (item === t("menu.team")) {
+                          const target = document.getElementById('team');
+                          if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }
+                        if (item === t("menu.contact")) {
+                          setIsContactOpen(true);
                         }
                         setIsMenuOpen(false);
                       }}

@@ -6,6 +6,7 @@ import { Footer } from "@/components/Footer";
 import { HeroSection } from "@/components/HeroSection";
 import { TeamSection } from "@/components/TermSection";
 import { FullscreenPrompt } from "@/components/FullscreenPrompt";
+import { AboutSection } from "@/components/AboutSection";
 
 export default function Home() {
   const [isFullscreenEntered, setIsFullscreenEntered] = useState(false);
@@ -75,6 +76,7 @@ export default function Home() {
       {(isFullscreenEntered || hasShownPrompt) && (
         <main className="flex overflow-hidden flex-col pb-11 bg-black">
           <HeroSection isVideoOpen={isVideoOpen} setIsVideoOpen={setIsVideoOpen} />
+          <AboutSection />
           <TeamSection audioEnabled={audioEnabled} />
           <BrandSection setIsVideoOpen={setIsVideoOpen} />
           <Footer />
