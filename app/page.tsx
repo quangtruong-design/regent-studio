@@ -13,6 +13,7 @@ export default function Home() {
   const [audioEnabled, setAudioEnabled] = useState(false);
   const [hasShownPrompt, setHasShownPrompt] = useState(false);
   const [isVideoOpen, setIsVideoOpen] = useState(false);
+  const [isAboutOpen, setIsAboutOpen] = useState(false);
 
   // Check if already in fullscreen on mount
   useEffect(() => {
@@ -74,13 +75,19 @@ export default function Home() {
 
       {/* Main Content - Always visible once fullscreen has been entered */}
       {(isFullscreenEntered || hasShownPrompt) && (
-        <main className="flex overflow-hidden flex-col pb-11 bg-black">
-          <HeroSection isVideoOpen={isVideoOpen} setIsVideoOpen={setIsVideoOpen} />
-          <AboutSection />
-          <TeamSection audioEnabled={audioEnabled} />
-          <BrandSection setIsVideoOpen={setIsVideoOpen} />
-          <Footer />
-        </main>
+        <>
+          <main className="flex overflow-hidden flex-col pb-11 bg-black">
+            <HeroSection
+              isVideoOpen={isVideoOpen}
+              setIsVideoOpen={setIsVideoOpen}
+              onOpenAbout={() => setIsAboutOpen(true)}
+            />
+            <TeamSection audioEnabled={audioEnabled} />
+            <BrandSection setIsVideoOpen={setIsVideoOpen} />
+            <Footer />
+          </main>
+          <AboutSection isOpen={isAboutOpen} onClose={() => setIsAboutOpen(false)} />
+        </>
       )}
     </>
   );

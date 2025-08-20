@@ -47,9 +47,10 @@ function LogoComponent() {
 interface HeroSectionProps {
   isVideoOpen: boolean;
   setIsVideoOpen: (isOpen: boolean) => void;
+  onOpenAbout?: () => void;
 }
 
-export function HeroSection({ isVideoOpen, setIsVideoOpen }: HeroSectionProps) {
+export function HeroSection({ isVideoOpen, setIsVideoOpen, onOpenAbout }: HeroSectionProps) {
   const sectionRef = useRef<HTMLElement>(null);
   const titleRef = useRef<HTMLDivElement>(null);
   const [isContactOpen, setIsContactOpen] = useState(false);
@@ -423,12 +424,7 @@ export function HeroSection({ isVideoOpen, setIsVideoOpen }: HeroSectionProps) {
                           setIsVideoOpen(true);
                         }
                         if (item === t("menu.aboutUs")) {
-                          const target = document.getElementById('about');
-                          if (target) {
-                            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                          } else {
-                            window.location.hash = '#about';
-                          }
+                          if (onOpenAbout) onOpenAbout();
                         }
                         if (item === t("menu.home")) {
                           window.scrollTo({ top: 0, behavior: 'smooth' });
