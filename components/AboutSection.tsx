@@ -1,7 +1,7 @@
 "use client";
 
-import { motion, useInView } from "framer-motion";
-import React, { useMemo, useRef, useState } from "react";
+import { motion } from "framer-motion";
+import React, { useMemo, useState } from "react";
 import { useLanguage } from "../contexts/LanguageContext";
 
 type PdfItem = {
@@ -10,11 +10,14 @@ type PdfItem = {
   url: string;
 };
 
-export function AboutSection() {
-  const sectionRef = useRef<HTMLElement>(null);
-  const isInView = useInView(sectionRef, { once: true, margin: "-100px" });
+interface AboutOverlayProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export function AboutSection({ isOpen, onClose }: AboutOverlayProps) {
   const { t } = useLanguage();
-  // Static list of PDFs from public/pdfs. Developers can add/remove entries here.
+
   const pdfFiles: PdfItem[] = useMemo(
     () => [
       { id: "about-company", name: "About Company.pdf", url: "/pdfs/Brandguideline final a4_newwsuatrangcuoi.pdf" },
@@ -22,89 +25,171 @@ export function AboutSection() {
     ],
     []
   );
+  
 
   const [selectedId, setSelectedId] = useState<string>(pdfFiles[0]?.id || "");
   const selectedPdf = pdfFiles.find((it) => it.id === selectedId) || pdfFiles[0];
+  const [isSlideshowOpen, setIsSlideshowOpen] = useState<boolean>(false);
+
+  const iframeSrc = React.useMemo(
+    () => encodeURI((selectedPdf?.url || "") + "#toolbar=0&navpanes=0&scrollbar=0"),
+    [selectedPdf]
+  );
+
+  React.useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOpen]);
+
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        if (isSlideshowOpen) {
+          setIsSlideshowOpen(false);
+        } else if (isOpen) {
+          onClose();
+        }
+      }
+    };
+    if (isOpen || isSlideshowOpen) {
+      document.addEventListener("keydown", handleKeyDown);
+    }
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, isSlideshowOpen, onClose]);
+
+  if (!isOpen) return null;
 
   return (
-    <motion.section
-      ref={sectionRef}
-      id="about"
-      className="relative py-20 bg-gradient-to-br from-slate-900 via-black to-slate-800 overflow-hidden"
-      initial={{ opacity: 0, y: 50 }}
-      animate={isInView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.8 }}
+    <>
+    <motion.div
+      role="dialog"
+      aria-modal="true"
+      aria-label={t("menu.aboutUs") || "About Us PDFs"}
+      className="fixed inset-0 z-[9999] bg-black/80 flex items-center justify-center"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
+      onClick={() => onClose()}
     >
-      {/* Background accents */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <motion.div
-          className="absolute top-16 left-1/4 w-72 h-72 bg-lime-400/10 rounded-full blur-3xl"
-          initial={{ opacity: 0 }}
-          animate={isInView ? { opacity: 1 } : {}}
-          transition={{ delay: 0.2, duration: 0.8 }}
-        />
-        <motion.div
-          className="absolute -bottom-8 right-16 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl"
-          initial={{ opacity: 0 }}
-          animate={isInView ? { opacity: 1 } : {}}
-          transition={{ delay: 0.4, duration: 0.8 }}
-        />
-      </div>
+      <div
+        className="relative bg-white w-[90vw] h-[90vh] rounded-xl shadow-2xl overflow-hidden flex flex-col"
+        onClick={(e) => e.stopPropagation()}
+      >
+      <div 
+  className="p-3 flex flex-wrap gap-3 items-center justify-between border-b border-black/10"
+  style={{ backgroundColor: "#000035" }}
+>
+  <div className="flex flex-wrap gap-2">
+    {pdfFiles.map((item) => (
+      <button
+        key={item.id}
+        onClick={() => setSelectedId(item.id)}
+        style={{ backgroundColor: "#a2ff00", color: "#000035" }}
+        className={`px-4 py-2 rounded-lg text-sm font-semibold ${
+          selectedId === item.id ? "opacity-100" : "opacity-80 hover:opacity-100"
+        }`}
+      >
+        {item.name}
+      </button>
+    ))}
+  </div>
+  <div className="flex gap-2">
+    <button
+      onClick={() => setIsSlideshowOpen(true)}
+      title="Open slideshow"
+      aria-label="Open slideshow"
+      style={{ backgroundColor: "#a2ff00", color: "#000035" }}
+      className="px-4 py-2 rounded-lg text-sm font-semibold"
+    >
+      Slideshow
+    </button>
+    <button
+      onClick={() => onClose()}
+      style={{ backgroundColor: "#a2ff00", color: "#000035" }}
+      className="px-4 py-2 rounded-lg text-sm font-semibold"
+    >
+      {t("about.exit")}
+    </button>
+  </div>
+</div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-20">
-        {/* Header */}
-        <div className="text-center mb-10">
-          <h2 className="text-5xl lg:text-6xl font-black text-white mb-4">
-            {t("menu.aboutUs")}
-          </h2>
-          <p className="text-gray-400 max-w-3xl mx-auto">
-            {t("about.instructions")}
-          </p>
+        <div className="flex-1">
+          <iframe
+            key={iframeSrc}
+            src={iframeSrc}
+            title={selectedPdf?.name}
+            className="w-full h-full"
+          />
         </div>
-
-        {/* Controls */}
-        {pdfFiles.length > 0 && (
-          <div className="flex flex-wrap items-center justify-center gap-3 mb-10">
-            {pdfFiles.map((pdf) => {
-              const isActive = pdf.id === selectedId;
-              return (
-                <motion.button
-                  key={pdf.id}
-                  onClick={() => setSelectedId(pdf.id)}
-                  className={`px-4 py-2 rounded-xl text-sm font-semibold transition-colors border ${
-                    isActive
-                      ? "bg-lime-400 text-black border-lime-300"
-                      : "glass-effect text-white border-white/20"
-                  }`}
-                  whileHover={{ scale: 1.03 }}
-                  whileTap={{ scale: 0.97 }}
-                >
-                  {pdf.name}
-                </motion.button>
-              );
-            })}
-          </div>
-        )}
-
-        {/* Viewer */}
-        {pdfFiles.length === 0 ? (
-          <div className="glass-effect border border-white/10 rounded-2xl p-10 text-center text-gray-400">
-            {t("about.noPdf")}
-          </div>
-        ) : (
-          <div className="w-full">
-            <div className="glass-effect border border-white/10 rounded-2xl overflow-hidden">
-              <iframe
-                title={selectedPdf.name}
-                src={`${selectedPdf.url}#zoom=page-fit`}
-                className="w-full h-[65vh] md:h-[80vh]"
-              />
-            </div>
-          </div>
-        )}
       </div>
-    </motion.section>
+    </motion.div>
+
+    <PdfSlideshow
+      isOpen={isSlideshowOpen}
+      onClose={() => setIsSlideshowOpen(false)}
+      src={iframeSrc}
+      title={selectedPdf?.name}
+    />
+    </>
   );
 }
 
+// Fullscreen slideshow overlay
+export function PdfSlideshow({
+  isOpen,
+  onClose,
+  src,
+  title,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  src: string;
+  title?: string;
+}) {
+  React.useEffect(() => {
+    if (!isOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", onKey);
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = "";
+    };
+  }, [isOpen, onClose]);
 
+  if (!isOpen) return null;
+
+  return (
+    <motion.div
+      role="dialog"
+      aria-modal="true"
+      aria-label={title || "PDF Slideshow"}
+      className="fixed inset-0 z-[10000] bg-black/90 flex items-center justify-center"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
+      onClick={onClose}
+    >
+      <div className="relative w-screen h-screen" onClick={(e) => e.stopPropagation()}>
+        <div className="absolute top-4 right-4">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 rounded-lg text-sm font-semibold opacity-0 hover:opacity-100 transition-opacity duration-300"
+            style={{ backgroundColor: "#a2ff00", color: "#000035" }}
+          >
+            Close
+          </button>
+        </div>
+        <iframe key={src} src={src} title={title} className="w-full h-full pointer-events-auto" />
+      </div>
+    </motion.div>
+  );
+}
