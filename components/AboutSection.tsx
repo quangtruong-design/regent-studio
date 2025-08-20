@@ -18,14 +18,22 @@ interface AboutOverlayProps {
 export function AboutSection({ isOpen, onClose }: AboutOverlayProps) {
   const { t } = useLanguage();
 
-  const pdfFiles: PdfItem[] = useMemo(
-    () => [
-      { id: "about-company", name: "About Company.pdf", url: "/pdfs/Brandguideline final a4_newwsuatrangcuoi.pdf" },
-      { id: "team-info", name: "Team Info.pdf", url: "/pdfs/Storyboard.pdf" },
-    ],
-    []
-  );
-  
+ const pdfFiles: PdfItem[] = useMemo(
+  () => [
+    {
+      id: "about-company",
+      name: "About Regent",
+      url: "https://anhba.s3.ap-southeast-1.amazonaws.com/Brandguideline.final.a4_newwsuatrangcuoi.pdf"
+    },
+    {
+      id: "team-info",
+      name: "About our products",
+      url: "/pdfs/Storyboard.pdf"
+    },
+  ],
+  []
+);
+
 
   const [selectedId, setSelectedId] = useState<string>(pdfFiles[0]?.id || "");
   const selectedPdf = pdfFiles.find((it) => it.id === selectedId) || pdfFiles[0];
