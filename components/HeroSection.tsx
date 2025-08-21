@@ -439,7 +439,7 @@ export function HeroSection({ isVideoOpen, setIsVideoOpen, onOpenAbout }: HeroSe
                         }
                               }
                         if (item === t("menu.ourGame")) {
-                          setIsourGameOpen("https://drive-nation-six.vercel.app/", "_blank");
+                          window.open("https://drive-nation-six.vercel.app/", "_blank");
                         }
                         setIsMenuOpen(false);
                       }}
