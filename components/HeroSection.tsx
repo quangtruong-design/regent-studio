@@ -409,7 +409,7 @@ export function HeroSection({ isVideoOpen, setIsVideoOpen, onOpenAbout }: HeroSe
                   t("menu.products"),
                   t("menu.team"),
                   t("menu.contact"),
-                  t('menu.ourGame'),
+                  t("menu.ourGame"),
                 ].map((item, index) => (
                   <motion.div
                     key={item}
