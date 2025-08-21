@@ -437,7 +437,6 @@ export function HeroSection({ isVideoOpen, setIsVideoOpen, onOpenAbout }: HeroSe
                         if (item === t("menu.contact")) {
                           setIsContactOpen(true);
                         }
-                              }
                         if (item === t("menu.ourGame")) {
                           window.open("https://drive-nation-six.vercel.app/", "_blank");
                         }
