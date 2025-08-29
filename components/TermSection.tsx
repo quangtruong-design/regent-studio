@@ -15,37 +15,37 @@ const teamMembers: TeamMember[] = [
   {
     name: "Lê Quang Trường",
     image:
-      "https://api.builder.io/api/v1/image/assets/TEMP/2d2355fcfd15ca05dd14de041d6ae7ef3df01f81?placeholderIfAbsent=true&apiKey=a20fe3d689b84152a6502d95e7e72213",
+      "/images/lequangtruong.jpg",
     bioKey: "leQuangTruong",
   },
   {
     name: "Lê Quỳnh Như",
     image:
-      "https://api.builder.io/api/v1/image/assets/TEMP/7270f34ee198dd4ab656a7a419a1bb7a0a1c9c34?placeholderIfAbsent=true&apiKey=a20fe3d689b84152a6502d95e7e72213",
+      "/images/nhu.jpg",
     bioKey: "leQuynhNhu",
   },
   {
     name: "Cao Trường Kha",
     image:
-      "https://api.builder.io/api/v1/image/assets/TEMP/15ef7c5ac1ff02d05b008d9615a59dfe216edf2b?placeholderIfAbsent=true&apiKey=a20fe3d689b84152a6502d95e7e72213",
+      "/images/kha.jpg",
     bioKey: "caoTruongKha",
   },
   {
     name: "Nguyễn Hoài Bảo",
     image:
-      "https://api.builder.io/api/v1/image/assets/TEMP/ce01a5477a99b9c9ba0fb16b7888d1f9d5b091bb?placeholderIfAbsent=true&apiKey=a20fe3d689b84152a6502d95e7e72213",
+      "/images/bao.jpg",
     bioKey: "nguyenHoaiBao",
   },
   {
     name: "Trần Văn Anh Kiệt",
     image:
-      "https://api.builder.io/api/v1/image/assets/TEMP/ce01a5477a99b9c9ba0fb16b7888d1f9d5b091bb?placeholderIfAbsent=true&apiKey=a20fe3d689b84152a6502d95e7e72213",
+      "/images/kiet.jpg",
     bioKey: "tranVanAnhKiet",
   },
   {
     name: "Châu Anh Thư",
     image:
-      "https://api.builder.io/api/v1/image/assets/TEMP/ce01a5477a99b9c9ba0fb16b7888d1f9d5b091bb?placeholderIfAbsent=true&apiKey=a20fe3d689b84152a6502d95e7e72213",
+      "/images/thu.jpg",
     bioKey: "chauAnhThu",
   },
 ];
