@@ -15,7 +15,7 @@ const teamMembers: TeamMember[] = [
   {
     name: "Lê Quang Trường",
     image:
-      "/images/lequangtruong.jpg",
+      "/images/truong.jpg",
     bioKey: "leQuangTruong",
   },
   {
@@ -27,7 +27,7 @@ const teamMembers: TeamMember[] = [
   {
     name: "Cao Trường Kha",
     image:
-      "/images/kha2.jpg",
+      "/images/khaaa.jpg",
     bioKey: "caoTruongKha",
   },
   {
